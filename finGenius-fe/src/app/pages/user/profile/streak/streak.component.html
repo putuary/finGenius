@@ -1,0 +1,35 @@
+<nav class="p-6 bg-sky-500 text-white flex justify-between items-center shadow-md sticky top-0 z-[99999]">
+    <button (click)="goBack()">
+      <i class="fa-solid fa-arrow-left text-xl"></i>
+    </button>
+    <span class="font-bold text-sm pr-4">Streak Rewards</span>
+    <div></div>
+  </nav>
+  <div class="flex flex-col items-center px-12">
+    <div class="flex flex-col w-full space-y-6 pt-8">
+      <ng-container *ngFor="let reward of rewards">
+        <div *ngIf="currentStreak >= reward.streak" class="flex items-center bg-[#1ca3ec] border-2 border-[#163851] rounded-md px-4 h-[120px] justify-center">
+          <div class="flex flex-col items-center text-center justify-center">
+            <div>
+              <span class="fas fa-gift text-[25px] text-white"></span>
+            </div>
+            <div class="text-sm text-white">
+              {{ reward.name }} - Unlocked at {{ reward.streak }} streak points
+            </div>
+            <a [href]="reward.linkFile" class="text-xs text-white underline">Download</a>
+          </div>
+        </div>
+        <div *ngIf="currentStreak < reward.streak" class="flex items-center bg-[#163851] border-2 border-[#163851] rounded-md px-4 h-[120px] justify-center">
+          <div class="flex flex-col items-center text-center justify-center">
+            <div>
+              <span class="fas fa-lock text-[25px] text-white"></span>
+            </div>
+            <div class="text-sm text-white">
+              Unlocked when you have {{ reward.streak }} streak points
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  

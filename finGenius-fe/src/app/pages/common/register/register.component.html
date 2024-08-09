@@ -1,0 +1,106 @@
+<div class="flex items-center justify-center w-full h-screen bg-[#163851]">
+  <div
+    class="flex flex-col items-center justify-center bg-white px-8 py-8 rounded-md space-y-8 w-[375px]"
+  >
+    <div class="flex space-x-3 items-center flex-col">
+      <img src="/favicon.ico" alt="" class="w-[75px]" />
+    </div>
+    <form
+      [formGroup]="registerForm"
+      class="space-y-5 w-full flex flex-col items-center"
+      (ngSubmit)="onRegister()"
+    >
+      <div class="w-full">
+        <div>Full name:</div>
+        <input
+          class="border-2 border-black rounded-md px-2 py-2 w-full"
+          formControlName="fullname"
+        />
+        <div
+          *ngIf="
+            registerForm.controls['fullname'].touched &&
+            registerForm.controls['fullname'].invalid
+          "
+          class="text-red-500 text-sm"
+        >
+          Full name is required.
+        </div>
+      </div>
+      <div class="w-full">
+        <div>Email:</div>
+        <input
+          class="border-2 border-black rounded-md px-2 py-2 w-full"
+          formControlName="email"
+        />
+        <div
+          *ngIf="
+            registerForm.controls['email'].touched &&
+            registerForm.controls['email'].invalid
+          "
+          class="text-red-500 text-sm"
+        >
+          <div *ngIf="registerForm.controls['email'].errors?.['required']">
+            Email is required.
+          </div>
+          <div *ngIf="registerForm.controls['email'].errors?.['invalidPrefix']">
+            Invalid email prefix.
+          </div>
+          <div *ngIf="registerForm.controls['email'].errors?.['invalidDomain']">
+            Invalid email domain.
+          </div>
+          <div *ngIf="registerForm.controls['email'].errors?.['invalidEmail']">
+            Invalid email format.
+          </div>
+        </div>
+      </div>
+      <div class="w-full">
+        <div>Password:</div>
+        <div class="flex border-2 border-black rounded-md px-2 py-2 space-x-2">
+          <input
+            [type]="hidePassword ? 'password' : 'text'"
+            class="rounded-md outline-none w-full"
+            formControlName="password"
+          />
+          <button type="button" (click)="togglePasswordVisibility()">
+            <i
+              class="fas"
+              [ngClass]="hidePassword ? 'fa-eye-slash' : 'fa-eye'"
+            ></i>
+          </button>
+        </div>
+        <div
+          *ngIf="
+            registerForm.controls['password'].touched &&
+            registerForm.controls['password'].invalid
+          "
+          class="text-red-500 text-sm"
+        >
+          <div *ngIf="registerForm.controls['password'].errors?.['required']">
+            Password is required.
+          </div>
+          <div *ngIf="!registerForm.controls['password'].errors?.['required']">
+            Password must contain
+            {{ registerForm.controls['password'].errors?.['invalidPassword']?.join(', ')
+
+            }}.
+          </div>
+        </div>
+      </div>
+      <button
+        class="px-8 py-3 rounded-md bg-[#1CA3EC] text-white"
+        type="submit"
+      >
+        @if (this.isLoading) {
+        <p-progressSpinner styleClass="w-5 h-5" ariaLabel="loading" />
+        } @else { Register }
+      </button>
+    </form>
+    <div class="flex space-x-2 items-center text-sm">
+      <div>Already have an account?</div>
+      <a routerLink="/login" class="text-[#1CA3EC] underline">Login</a>
+    </div>
+  </div>
+</div>
+<p-toast
+  [breakpoints]="{ '920px': { width: '100%', right: '0', left: '0' } }"
+/>

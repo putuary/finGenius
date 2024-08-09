@@ -1,0 +1,207 @@
+<nav
+  class="p-6 bg-sky-500 text-white flex justify-between items-center shadow-md sticky top-0 z-[999]"
+>
+  <button (click)="this.goBack()">
+    <i class="fa-solid fa-arrow-left text-xl"></i>
+  </button>
+  <span class="font-bold text-sm">Your Logs</span>
+  <button (click)="this.openModalFilter()">
+    <i class="fa-solid fa-filter text-xl"></i>
+  </button>
+</nav>
+<div class="px-6">
+  <div class="my-5">
+    <p-inputGroup>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="this.query"
+        [ngModelOptions]="{ standalone: true }"
+        placeholder="Search Your Logs..."
+      />
+      <button
+        type="button"
+        pButton
+        icon="pi pi-search"
+        class="p-button-warning"
+        (click)="this.getAllTransaction()"
+      ></button>
+    </p-inputGroup>
+  </div>
+  @if (this.transactions.length) {
+  <div class="flex flex-col gap-y-3">
+    @for (transaction of this.transactions; track $index) {
+    <div
+      pRipple
+      (click)="openModalDetailTransaction(transaction)"
+      class="border styled-box-blue flex justify-between items-center border-gray-300 rounded-md p-3 shadow hover:-translate-y-1 hover:shadow-lg"
+    >
+      <div class="flex items-start gap-3">
+        <div
+          class="p-4 rounded text-white"
+          [ngStyle]="{ 'background-color': transaction.category.color }"
+        >
+          <i [class]="transaction.category.icon + ' text-xl'"></i>
+        </div>
+        <div class="flex flex-col gap-1">
+          <h1 class="font-semibold text-sm text-gray-700">
+            {{ transaction.name }}
+          </h1>
+          <h2 class="text-xs">
+            {{ transaction.createdAt | date : "d MMMM y" }}
+          </h2>
+          <p class="text-xs font-light">{{ transaction.description }}</p>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+  } @else {
+  <div class="w-full flex flex-col justify-center items-center">
+    <img src="./assets/images/Filenull.svg" alt="not found" class="w-72" />
+    <h1 class="font-bold text-2xl text-gray-500 text-center">
+      Oops, there are no financial records yet...
+    </h1>
+  </div>
+  }
+  <div class="mb-32"></div>
+</div>
+
+<p-dialog
+  header="Filter"
+  [modal]="true"
+  [(visible)]="visible"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  [style]="{ width: '22rem' }"
+>
+  <ng-container>
+    <form>
+      <div class="flex flex-col gap-2 my-3 w-full">
+        <label>Filter By</label>
+        <p-dropdown
+          [options]="filterBy"
+          [(ngModel)]="selectedFilterBy"
+          optionLabel="name"
+          placeholder="Filter By"
+          (ngModelChange)="this.onFilterByChange()"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      @if (this.disableFilter || this.selectedFilter) { @if
+      (this.selectedFilterBy.value === 'category') {
+      <div class="flex flex-col gap-2 my-3 w-full">
+        <label>{{ this.selectedFilterBy.value }}</label>
+        <p-dropdown
+          [options]="this.categoryFilter"
+          [(ngModel)]="selectedTypeFilter"
+          optionLabel="name"
+          placeholder="{{ this.selectedFilterBy.value }}"
+          (ngModelChange)="this.onFilterChange()"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      } @else {
+      <div class="flex flex-col gap-2 my-3 w-full">
+        <label>{{ this.selectedFilterBy.value }}</label>
+        <p-dropdown
+          [options]="this.typeFilter"
+          [(ngModel)]="selectedTypeFilter"
+          optionLabel="name"
+          placeholder="{{ this.selectedFilterBy.value }}"
+          (ngModelChange)="this.onFilterChange()"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      } }
+      <div class="flex flex-col gap-2 my-3">
+        <label>Start Date</label>
+        <input
+          pInputText
+          autocomplete="off"
+          type="date"
+          [(ngModel)]="this.startDate"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      <div class="flex flex-col gap-2 my-3">
+        <label>End Date</label>
+        <input
+          pInputText
+          autocomplete="off"
+          type="date"
+          [(ngModel)]="this.endDate"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      <div class="flex justify-content-end gap-2 pt-6">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          (click)="this.visible = false"
+        ></p-button>
+        <p-button
+          label="Filter"
+          (click)="this.filterClick()"
+          [disabled]="this.disableFilter"
+        ></p-button>
+      </div>
+    </form>
+  </ng-container>
+</p-dialog>
+
+<p-dialog
+  *ngIf="this.selectedTransaction"
+  header="Detail Transaction"
+  [(visible)]="this.visibleModalDetail"
+  [modal]="true"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  [style]="{ width: '22rem' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div class="my-4 flex gap-4">
+    <div
+      class="h-14 p-4 rounded text-white"
+      [ngStyle]="{
+        'background-color': this.selectedTransaction.category.color
+      }"
+    >
+      <i [class]="this.selectedTransaction.category.icon + ' text-2xl'"></i>
+    </div>
+    <div class="flex flex-col gap-4">
+      <div>
+        <h1 class="font-bold text-xl">{{ this.selectedTransaction.name }}</h1>
+        <h2 class="text-gray-500 text-xs">
+          {{ this.selectedTransaction.createdAt | date : "d MMMM y" }}
+        </h2>
+        <p class="text-sm font-light">
+          {{ this.selectedTransaction.description }}
+        </p>
+      </div>
+      <div class="flex flex-col gap-1">
+        <p class="text-xs">
+          Amount :
+          {{
+            this.selectedTransaction.amount
+              | currency : "Rp." : "symbol" : "1.0"
+          }}
+        </p>
+        <p class="text-xs">
+          Type : {{ this.selectedTransaction.category.type.name }}
+        </p>
+        <p class="text-xs">
+          Category : {{ this.selectedTransaction.category.name }}
+        </p>
+      </div>
+      <p-button
+        (click)="this.alertDeleteTransaction(this.selectedTransaction.id)"
+        size="small"
+        label="Delete"
+        severity="danger"
+      />
+    </div>
+  </div>
+</p-dialog>
+<p-toast
+  [breakpoints]="{ '920px': { width: '100%', right: '0', left: '0' } }"
+/>

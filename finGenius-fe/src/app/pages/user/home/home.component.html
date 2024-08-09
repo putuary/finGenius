@@ -1,0 +1,206 @@
+<nav
+  class="p-6 bg-sky-500 rounded-b-[3rem] text-white flex justify-between items-center shadow-md"
+>
+  <div class="flex flex-col gap-1">
+    <h1 class="font-bold text-sm" *ngIf="user">Hello {{ user.fullname }}</h1>
+
+    <span (click)="this.openFilterModal()" class="text-[10px]">{{
+      dateNow | date : "EEEE, d MMMM y"
+    }}</span>
+  </div>
+  <div>
+    <span class="text-[14px]">Your Balance</span>
+    <h1 class="font-bold text-xs" *ngIf="user">
+      {{ this.user.balance | currency : "Rp." : "symbol" : "1.0" }}
+    </h1>
+  </div>
+</nav>
+
+@if (this.statisticsChart.length) {
+<div class="p-4 bg-white flex flex-col gap-3 items-center my-4">
+  <div class="text-center">
+    <span class="text-gray-500">Fin Genius is here</span>
+    <h1 class="font-semibold">Percentage Chart of Your Financial Records</h1>
+    <h2 class="text-xs font-light text-gray-500">
+      From {{ this.startDate }} to {{ this.endDate }}
+    </h2>
+  </div>
+  <p-chart type="pie" [data]="data" [options]="options" />
+</div>
+
+<div class="flex flex-col gap-2 items-center mx-7 mb-6 text-white">
+  <div
+    class="flex items-center justify-between w-full cursor-pointer"
+    *ngIf="this.totalExpense"
+  >
+    <div class="flex items-center space-x-3">
+      <div
+        class="flex rounded-md bg-[#CCF1FE] w-10 h-10 items-center justify-center"
+      >
+        <span class="fas fa-money-bill-trend-up text-[#1ca3ec]"></span>
+      </div>
+      <h3 class="text-gray-700 text-xs">Total Expense</h3>
+    </div>
+    <div class="text-sm text-green-500">
+      {{ this.totalExpense | currency : "Rp." : "symbol" : "1.0" }}
+    </div>
+  </div>
+  <button
+    routerLink="/transaction-logs"
+    class="p-3 shadow rounded bg-sky-400 hover:bg-sky-500 active:bg-sky-600 transition-all ease-in-out text-xs w-full"
+  >
+    <i class="fa-solid fa-money-bill-transfer mr-1"></i>
+    Your Logs
+  </button>
+</div>
+} @else {
+<div class="flex flex-col justify-center items-center my-5">
+  <img src="./assets/images/hello.svg" class="w-64 h-64" alt="Logo" />
+  <h1 class="font-semibold text-xl text-sky-800" *ngIf="this.user">
+    Hello, {{ this.user.fullname }}
+  </h1>
+  <span class="text-gray-500 font-light"
+    >You don't have financial records yet</span
+  >
+</div>
+}
+
+<div>
+  <div class="grid grid-cols-3 gap-y-7 px-3 place-items-center mt-5">
+    @for (category of this.categories; track $index) {
+    <button
+      (click)="openModal(category)"
+      [ngStyle]="{ 'background-color': category.color }"
+      class="p-2 rounded-lg shadow-xl w-20 h-20 flex flex-col gap-3 text-white justify-center items-center hover:bg-gray-200 cursor-pointer"
+    >
+      <i [class]="category.icon + ' text-3xl'"></i>
+      <span class="text-xs">{{ category.name }}</span>
+    </button>
+    }
+  </div>
+</div>
+
+<div class="p-4 bg-white mx-9 my-5 text-center flex flex-col gap-2">
+  <h1 class="italic text-gray-500 font-bold">"{{ this.quotes.quote }}"</h1>
+  <span class="text-gray-500 font-light">- {{ this.quotes.author }}</span>
+</div>
+
+<div class="pb-20"></div>
+
+<p-dialog
+  *ngIf="this.categorySelected"
+  header="Record {{ this.categorySelected.name }}"
+  [modal]="true"
+  [(visible)]="visible"
+  [style]="{ width: '22rem' }"
+>
+  <ng-container>
+    <div *ngIf="showWarning" class="text-red-500 font-bold">
+      Warning:
+      <span class="text-black font-normal"
+        >The total {{ this.categorySelected.name }} record is reaching the
+        budget limit!</span
+      >
+    </div>
+    <form [formGroup]="this.formTransaction">
+      <div class="flex flex-col gap-3 my-3">
+        <input
+          pInputText
+          autocomplete="off"
+          type="text"
+          formControlName="name"
+          placeholder="Input Name Amount"
+        />
+      </div>
+      <div class="flex flex-col gap-3 mb-3">
+        <input
+          pInputText
+          autocomplete="off"
+          type="text"
+          formControlName="description"
+          placeholder="Input Description"
+        />
+      </div>
+      <div class="flex flex-col gap-3 mb-3">
+        <input
+          pInputText
+          autocomplete="off"
+          type="number"
+          formControlName="amount"
+          placeholder="Input Your Amount"
+        />
+      </div>
+      <div class="flex flex-col gap-3 mb-3">
+        <input
+          pInputText
+          autocomplete="off"
+          type="datetime-local"
+          max="{{ this.currentDate }}"
+          formControlName="createdAt"
+          placeholder="Input Date (Optional)..."
+        />
+      </div>
+      <div class="flex justify-content-end gap-2 pt-6">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          (click)="this.visible = false"
+        ></p-button>
+        <p-button label="Save" (click)="saveTransaction()"></p-button>
+      </div>
+    </form>
+  </ng-container>
+</p-dialog>
+
+<p-dialog
+  header="Filter Date"
+  [modal]="true"
+  [(visible)]="visibleModalFilter"
+  [style]="{ width: '22rem' }"
+>
+  <ng-container>
+    <form>
+      <div class="flex flex-col gap-2 my-3">
+        <label>Select Type</label>
+        <p-dropdown
+          [options]="type"
+          [(ngModel)]="selectedType"
+          optionLabel="name"
+          placeholder="Select Type"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      <div class="flex flex-col gap-2 my-3">
+        <label>Start Date</label>
+        <input
+          pInputText
+          autocomplete="off"
+          type="date"
+          [(ngModel)]="this.startDate"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      <div class="flex flex-col gap-2 my-3">
+        <label>End Date</label>
+        <input
+          pInputText
+          autocomplete="off"
+          type="date"
+          [(ngModel)]="this.endDate"
+          [ngModelOptions]="{ standalone: true }"
+        />
+      </div>
+      <div class="flex justify-content-end gap-2 pt-6">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          (click)="this.visibleModalFilter = false"
+        ></p-button>
+        <p-button label="Filter" (click)="this.filterData()"></p-button>
+      </div>
+    </form>
+  </ng-container>
+</p-dialog>
+<p-toast
+  [breakpoints]="{ '920px': { width: '100%', right: '0', left: '0' } }"
+/>

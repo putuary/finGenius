@@ -1,0 +1,86 @@
+<section class="w-full pt-4">
+  <div class="flex flex-col items-center py-4 space-y-2 px-4 text-center">
+    <div class="font-semibold text-xl">Lock your Budget Limit!</div>
+    <div class="text-sm">
+      You need to set up your budget limit to activate the alert feature.
+    </div>
+  </div>
+  <div class="w-full">
+    <div class="w-full">
+      <div
+        class="flex-grow px-4 sm:max-h-[600px] max-h-[375px] overflow-y-auto"
+      >
+        <div
+          *ngFor="let item of budgetLimit; let i = index"
+          class="flex items-center justify-between border-b-2 border-gray-200 py-2 px-2"
+        >
+          <div
+            class="flex items-center space-x-3 cursor-pointer"
+            (click)="showDialog(item)"
+          >
+            <div
+              [style.background-color]="item.category.color"
+              class="w-[45px] h-[45px] rounded-full text-[20px] flex items-center justify-center"
+            >
+              <span [ngClass]="['fas', item.category.icon]" class="text-white"></span>
+            </div>
+            <div>{{ item.category.name }}</div>
+          </div>
+          <div class="flex items-center space-x-3">
+            <div class="text-[13px]">{{ item.amount }}</div>
+
+            <button
+              class="flex items-center justify-center w-[40px] h-[40px] rounded-full"
+              [ngClass]="item.active ? 'bg-green-500' : 'bg-red-500'"
+              (click)="changeBudgetStatus(i)"
+            >
+              <span
+                class="fas"
+                [ngClass]="item.active ? 'fa-lock' : 'fa-lock-open'"
+              ></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p-dialog
+    header="Set Budget Limit"
+    [modal]="true"
+    [(visible)]="visible"
+    [style]="{ width: '22rem' }"
+  >
+    <ng-container *ngIf="selectedItem">
+      <span class="p-text-secondary block mb-5">Category: {{ selectedItem.category.name }}</span>
+      <span class="p-text-secondary block mb-5">Current Limit: {{ selectedItem.amount }}</span>
+      <div class="flex flex-col gap-3 mb-3">
+        <label for="newLimit" class="font-semibold w-6rem">Set Limit</label>
+        <input
+          pInputText
+          id="newLimit"
+          class="flex-auto border-2 border-black rounded-md px-1"
+          autocomplete="off"
+          type="number"
+          [(ngModel)]="newLimit"
+        />
+      </div>
+      <div class="flex justify-content-end gap-2 pt-6">
+        <p-button label="Cancel" severity="secondary" (click)="visible = false"></p-button>
+        <p-button label="Save" (click)="saveNewLimit()"></p-button>
+      </div>
+    </ng-container>
+  </p-dialog>
+
+  <p-dialog
+    [modal]="true"
+    [(visible)]="errorVisible"
+    [style]="{ width: '22rem' }"
+    (onHide)="errorVisible = false"
+  >
+    <div class="flex flex-col items-center py-4 space-y-2 px-2 text-center">
+      <div class="text-red-500 text-xl pb-6 font-bold">You can't lock a budget limit of 0-100</div>
+      <p-button label="OK" (click)="errorVisible = false"></p-button>
+    </div>
+  </p-dialog>
+</section>

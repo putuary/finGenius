@@ -1,0 +1,47 @@
+<app-badge-dashboard>
+  <h1 class="font-bold">Tambah Data Reward</h1>
+</app-badge-dashboard>
+<div class="mt-3 p-4 bg-white rounded-md border">
+  <form
+    [formGroup]="this.FormReward"
+    class="flex flex-col gap-3"
+    (ngSubmit)="onSubmit()"
+  >
+    <div class="flex flex-col gap-2">
+      <label>Reward</label>
+      <input
+        pInputText
+        formControlName="name"
+        placeholder="Masukkan nama Reward..."
+      />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label>Link Reward</label>
+      <input
+        pInputText
+        formControlName="linkFile"
+        placeholder="Masukkan Link Reward"
+      />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label>Score Streak</label>
+      <input
+        pInputText
+        formControlName="streak"
+        placeholder="Masukkan jumlah score streak"
+      />
+    </div>
+    <div class="flex flex-col gap-2">
+      <label>Deskripsi</label>
+      <input
+        pInputText
+        formControlName="description"
+        placeholder="Masukkan deskripsi reward"
+      />
+    </div>
+    <p-button type="submit" label="Add Reward" />
+  </form>
+</div>
+<p-toast
+  [breakpoints]="{ '920px': { width: '100%', right: '0', left: '0' } }"
+/>

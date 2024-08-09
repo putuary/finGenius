@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=fingenius_db
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-fingenius:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  backend:
+    container_name: backend-spring
+    build: ./backend-fingenius
+    environment:
+      - APP_PORT=8081
+      - HOST_DB=db
+      - PORT_DB=5432
+      - DB_NAME=fingenius_db
+      - USERNAME_DB=postgres
+      - PASSWORD_DB=postgres
+    ports:
+      - 8081:8081
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  frontend:
+    build: ./finGenius-fe
+    ports:
+      - 4200:80
+    networks:
+      - app-network
+
+volumes:
+  postgres-fingenius:
+
+networks:
+  app-network:
+    driver: bridge

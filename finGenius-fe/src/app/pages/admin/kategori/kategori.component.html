@@ -1,0 +1,72 @@
+<app-badge-dashboard>
+  <div class="w-full flex justify-between items-center">
+    <h1 class="font-semibold">List Of Financial Record Categories</h1>
+    <p-button
+      routerLink="/kategori/add"
+      severity="success"
+      icon="pi pi-plus"
+      size="small"
+    />
+  </div>
+</app-badge-dashboard>
+<div class="mt-3 p-4 bg-white rounded-md border">
+  <p-table
+    [value]="this.category"
+    [paginator]="true"
+    [rows]="5"
+    [rowsPerPageOptions]="[5, 10, 20]"
+    [tableStyle]="{ 'min-width': '50rem' }"
+  >
+    <ng-template pTemplate="header">
+      <tr class="bg-white">
+        <th>No</th>
+        <th pSortableColumn="name">Kategori <p-sortIcon field="name" /></th>
+        <th>Icon</th>
+        <th>Warna</th>
+        <th pSortableColumn="type">Tipe <p-sortIcon field="type" /></th>
+        <th pSortableColumn="createdAt">
+          Created At <p-sortIcon field="createdAt" />
+        </th>
+        <th pSortableColumn="updatedAt">
+          Updated At <p-sortIcon field="updatedAt" />
+        </th>
+        <th>Action</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-type let-rowIndex="rowIndex">
+      <tr>
+        <td>{{ rowIndex + 1 }}</td>
+        <td>{{ type.name }}</td>
+        <td><i class="{{ type.icon }} text-2xl"></i></td>
+        <td>
+          <div
+            class="p-3 rounded"
+            [style]="{ 'background-color': type.color }"
+          ></div>
+        </td>
+        <td>{{ type.type.name }}</td>
+        <td>{{ type.createdAt | date }}</td>
+        <td>{{ type.updatedAt | date }}</td>
+        <td class="flex gap-3">
+          <p-button
+            routerLink="/kategori/update/{{ type.id }}"
+            label="Update"
+            icon="pi pi-pencil"
+            size="small"
+            severity="warning"
+          />
+          <p-button
+            (click)="this.deleteCategoryAlert(type.id)"
+            label="Delete"
+            icon="pi pi-trash"
+            size="small"
+            severity="danger"
+          />
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+<p-toast
+  [breakpoints]="{ '920px': { width: '100%', right: '0', left: '0' } }"
+/>

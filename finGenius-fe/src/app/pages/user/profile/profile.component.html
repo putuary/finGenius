@@ -1,0 +1,276 @@
+<section class="flex flex-col p-6 h-full space-y-6">
+  <div class="font-bold text-center">Profile</div>
+  <div class="flex items-center space-x-5 pt-2">
+    <div class="flex" *ngIf="this.user">
+      <img
+        src="http://localhost:8081/api/v1/user/avatar/{{ this.user.avatar }}"
+        (click)="this.openDialogAvatar()"
+        (error)="this.handleImageError($event)"
+        alt="avatar"
+        class="rounded-full w-20 h-20 object-cover object-center"
+      />
+    </div>
+    <div class="flex flex-col" *ngIf="this.user">
+      <div class="font-bold text-sm">{{ this.user.fullname }}</div>
+      <div class="text-[12px] text-gray-500">{{ this.user.email }}</div>
+    </div>
+  </div>
+  <div class="flex gap-2 w-full">
+    <button
+      (click)="this.openDialogProfile()"
+      class="flex items-center justify-center bg-[#1ca3ec] hover:bg-sky-400 active:bg-sky-600 transition-all ease-in-out duration-150 rounded-md py-2 text-white cursor-pointer w-full"
+    >
+      Edit Profile
+    </button>
+    <button
+      (click)="this.logout()"
+      class="flex items-center justify-center bg-red-500 hover:bg-red-400 active:bg-red-600 transition-all ease-in-out duration-150 rounded-md py-2 text-white cursor-pointer w-full"
+    >
+      Logout
+    </button>
+  </div>
+
+  <div
+    class="flex items-center justify-between cursor-pointer"
+    (click)="this.openDialogBalance()"
+    *ngIf="this.user"
+  >
+    <div class="flex items-center space-x-3">
+      <div
+        class="flex rounded-md bg-[#CCF1FE] w-10 h-10 items-center justify-center"
+      >
+        <span class="fas fa-wallet text-[#1ca3ec]"></span>
+      </div>
+      <div>Balance</div>
+    </div>
+    <div class="text-sm text-green-500">
+      {{ this.user.balance | currency : "Rp." }}
+    </div>
+  </div>
+
+  <div
+    class="flex items-center justify-between cursor-pointer"
+    (click)="openDialogSavings()"
+    *ngIf="this.user"
+  >
+    <div class="flex items-center space-x-3">
+      <div
+        class="flex rounded-md bg-[#CCF1FE] w-10 h-10 items-center justify-center"
+      >
+        <span class="fas fa-piggy-bank text-[#1ca3ec]"></span>
+      </div>
+      <div>Savings</div>
+    </div>
+    <div class="text-sm text-green-500">
+      {{ this.user.balanceSaving | currency : "Rp." }}
+    </div>
+  </div>
+  <div
+    class="flex items-center justify-between cursor-pointer"
+    (click)="openDialogAssets()"
+    *ngIf="this.user"
+  >
+    <div class="flex items-center space-x-3">
+      <div
+        class="flex rounded-md bg-[#CCF1FE] w-10 h-10 items-center justify-center"
+      >
+        <span class="fas fa-money-bill-trend-up text-[#1ca3ec]"></span>
+      </div>
+      <div>Purchased Asset</div>
+    </div>
+    <div class="text-sm text-green-500">
+      {{ this.user.balanceAsset | currency : "Rp." }}
+    </div>
+  </div>
+
+  <a
+    class="flex items-center justify-between cursor-pointer"
+    routerLink="/profile/streak"
+    *ngIf="this.user"
+  >
+    <div class="flex items-center space-x-3">
+      <div
+        class="flex rounded-md bg-[#CCF1FE] w-10 h-10 items-center justify-center"
+      >
+        <span class="fas fa-gift text-[#1ca3ec]"></span>
+      </div>
+      <div>Streak Points</div>
+    </div>
+    <div class="text-sm text-green-500">{{ this.user.streak }} Streak</div>
+  </a>
+</section>
+
+<p-dialog
+  header="Push The Savings"
+  [modal]="true"
+  [(visible)]="visibleUpdateSavings"
+  [style]="{ width: '22rem' }"
+>
+  <ng-container *ngIf="this.user">
+    <div>Current Savings: {{ this.user.balanceSaving | currency : "Rp." }}</div>
+    <div class="flex flex-col gap-3 mb-3 pt-4">
+      <input
+        pInputText
+        id="balanceAmount"
+        type="text"
+        [(ngModel)]="balanceAmount"
+        placeholder="Savings Amount"
+        autocomplete="off"
+      />
+    </div>
+    <div class="flex flex-col justify-content-end gap-2 pt-6 items-center">
+      <p-button
+        label="Push to Balance"
+        (click)="pushBalance('saving', 'balance')"
+        class="rounded-md"
+      ></p-button>
+    </div>
+  </ng-container>
+</p-dialog>
+
+<p-dialog
+  header="Push The Assets"
+  [modal]="true"
+  [(visible)]="visibleUpdateAssets"
+  [style]="{ width: '22rem' }"
+>
+  <ng-container *ngIf="this.user">
+    <div>Current Assets: {{ this.user.balanceAsset | currency : "Rp." }}</div>
+    <div class="flex flex-col gap-3 mb-3 pt-4">
+      <input
+        pInputText
+        id="balanceAmount"
+        type="text"
+        [(ngModel)]="balanceAmount"
+        placeholder="Assets Amount"
+        autocomplete="off"
+      />
+    </div>
+    <div class="flex flex-col justify-content-end gap-2 pt-6 items-center">
+      <p-button
+        label="Push to Balance"
+        (click)="pushBalance('asset', 'balance')"
+        class="rounded-md"
+      ></p-button>
+    </div>
+  </ng-container>
+</p-dialog>
+
+<p-dialog
+  header="Store Amount"
+  [(visible)]="visibleUpdateBalance"
+  [modal]="true"
+  [style]="{ width: '22rem' }"
+>
+  <ng-container>
+    <div class="flex flex-col gap-3 mb-3">
+      <label class="font-semibold">Amount</label>
+      <input
+        pInputText
+        id="balanceAmount"
+        type="text"
+        [(ngModel)]="balanceAmount"
+        placeholder="Enter Amount"
+        autocomplete="off"
+      />
+    </div>
+    <div class="flex flex-col justify-content-end gap-2 pt-6 items-center">
+      <p-button
+        label="Save to Savings"
+        (click)="pushBalance('balance', 'saving')"
+        icon="pi pi-save"
+        styleClass="p-button-success"
+      ></p-button>
+      <p-button
+        label="Save to Assets"
+        (click)="pushBalance('balance', 'asset')"
+        icon="pi pi-save"
+        styleClass="p-button-info"
+      ></p-button>
+    </div>
+  </ng-container>
+</p-dialog>
+
+<p-dialog
+  header="update Profile"
+  [modal]="true"
+  [(visible)]="visbleUpdateProfile"
+  [style]="{ width: '22rem' }"
+>
+  <ng-container>
+    <form [formGroup]="this.formUpdateProfile">
+      <div class="flex flex-col gap-3 my-3">
+        <input
+          pInputText
+          autocomplete="off"
+          type="text"
+          formControlName="fullname"
+          placeholder="Masukan Nama Anda"
+        />
+      </div>
+      <div class="flex flex-col gap-3 mb-3">
+        <input
+          pInputText
+          autocomplete="off"
+          type="text"
+          formControlName="email"
+          placeholder="Masukkan Email Anda"
+        />
+      </div>
+      <div class="flex flex-col gap-3 mb-3">
+        <input
+          pInputText
+          autocomplete="off"
+          type="password"
+          formControlName="password"
+          placeholder="Masukkan Password Anda"
+        />
+      </div>
+      <div class="flex justify-content-end gap-2 pt-6">
+        <p-button
+          label="Cancel"
+          severity="secondary"
+          (click)="this.visbleUpdateProfile = false"
+        ></p-button>
+        <p-button
+          label="Save"
+          (onClick)="updateProfile()"
+          icon="pi pi-check"
+          [loading]="loading"
+        ></p-button>
+      </div>
+    </form>
+  </ng-container>
+</p-dialog>
+
+<p-dialog
+  header="Update Avatar"
+  [(visible)]="this.visibleModalAvatar"
+  [modal]="true"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  [style]="{ width: '50vw' }"
+  [draggable]="true"
+  [resizable]="false"
+>
+  <ng-container>
+    <div class="my-3 flex flex-col gap-3">
+      <input
+        type="file"
+        (change)="this.onUpload($event)"
+        accept="image/*"
+        class="w-full"
+      />
+      <p-button
+        icon="pi pi-upload"
+        label="Upload"
+        size="small"
+        [loading]="loading"
+        (click)="this.updateAvatar()"
+      />
+    </div>
+  </ng-container>
+</p-dialog>
+
+<p-toast
+  [breakpoints]="{ '920px': { width: '100%', right: '0', left: '0' } }"
+/>
